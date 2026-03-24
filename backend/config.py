@@ -14,3 +14,9 @@ if env_file.exists():
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./dr_intel.db")
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+
+# Debug
+if not ANTHROPIC_API_KEY:
+    print(f"WARNING: ANTHROPIC_API_KEY vazio! Arquivo .env: {env_file}")
+else:
+    print(f"[OK] ANTHROPIC_API_KEY carregada ({len(ANTHROPIC_API_KEY)} chars)")

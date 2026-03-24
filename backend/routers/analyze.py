@@ -14,6 +14,14 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/offers", tags=["analyze"])
 
 
+@router.get("/debug/key")
+async def test_key():
+    """Debug endpoint para testar carregamento da chave."""
+    from config import ANTHROPIC_API_KEY
+    if ANTHROPIC_API_KEY:
+        return {"key_length": len(ANTHROPIC_API_KEY), "first_20": ANTHROPIC_API_KEY[:20]}
+    return {"error": "API key vazia"}
+
 @router.post("/{offer_id}/analyze")
 async def analyze(offer_id: int, db: Session = Depends(get_db)):
     offer = db.query(Offer).filter(Offer.id == offer_id).first()
