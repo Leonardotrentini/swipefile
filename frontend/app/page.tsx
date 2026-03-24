@@ -2,50 +2,37 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { api, DashboardStats } from "@/lib/api";
-
-function StatCard({
-  label,
-  value,
-  sub,
-  color = "text-white",
-}: {
-  label: string;
-  value: string | number;
-  sub?: string;
-  color?: string;
-}) {
-  return (
-    <div className="bg-[#12121a] border border-[#1e1e2e] rounded-xl p-5">
-      <p className="text-[#6b7280] text-xs font-medium uppercase tracking-wider mb-2">{label}</p>
-      <p className={`text-3xl font-bold ${color}`}>{value}</p>
-      {sub && <p className="text-[#4b5563] text-xs mt-1">{sub}</p>}
-    </div>
-  );
-}
+import { motion } from "framer-motion";
+import { api, DashboardStats, Offer } from "@/lib/api";
+import HeroSection from "@/components/HeroSection";
+import StatsCard from "@/components/StatsCard";
+import ScoreRing from "@/components/ScoreRing";
+import GlassCard from "@/components/GlassCard";
+import { TrendingUp, Award, Zap, Target } from "lucide-react";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [topOffers, setTopOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
-  const [seedMsg, setSeedMsg] = useState("");
 
   useEffect(() => {
-    api.dashboard
-      .stats()
-      .then(setStats)
+    Promise.all([api.dashboard.stats(), api.offers.list()])
+      .then(([s, offers]) => {
+        setStats(s);
+        setTopOffers(offers.slice(0, 3));
+      })
       .finally(() => setLoading(false));
   }, []);
 
   async function handleSeed() {
     setSeeding(true);
     try {
-      const res = await api.seed();
-      setSeedMsg(res.message);
+      await api.seed();
       const s = await api.dashboard.stats();
+      const offers = await api.offers.list();
       setStats(s);
-    } catch (e: unknown) {
-      setSeedMsg(e instanceof Error ? e.message : "Erro ao inserir seed");
+      setTopOffers(offers.slice(0, 3));
     } finally {
       setSeeding(false);
     }
@@ -53,155 +40,233 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-      </div>
+      <motion.div
+        className="flex items-center justify-center h-screen"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <div className="text-center space-y-4">
+          <motion.div
+            className="w-12 h-12 border-2 border-indigo-500 border-t-transparent rounded-full mx-auto"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          />
+          <p className="text-[#9ca3af]">Carregando seu swipe file...</p>
+        </div>
+      </motion.div>
     );
   }
 
   if (!stats) return null;
 
-  const scoreColor =
-    stats.avg_score >= 70
-      ? "text-emerald-400"
-      : stats.avg_score >= 45
-      ? "text-amber-400"
-      : "text-red-400";
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-          <p className="text-[#6b7280] text-sm mt-1">Visão geral do seu swipe file</p>
+    <motion.div
+      className="max-w-7xl mx-auto"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* Hero Section */}
+      <HeroSection />
+
+      {/* Main Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <StatsCard
+          label="Total de Ofertas"
+          value={stats.total_offers}
+          icon="📚"
+          color="indigo"
+          delay={0}
+        />
+        <StatsCard
+          label="Ofertas Hot"
+          value={stats.hot_offers}
+          icon="🔥"
+          color="pink"
+          delay={0.1}
+        />
+        <StatsCard
+          label="Analisadas"
+          value={stats.analyzed_offers}
+          icon="✨"
+          color="emerald"
+          delay={0.2}
+        />
+        <StatsCard
+          label="Score Médio"
+          value={stats.avg_score.toFixed(1)}
+          icon="🎯"
+          color="amber"
+          delay={0.3}
+        />
+      </div>
+
+      {/* Average Score Ring */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="mb-12 rounded-3xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 backdrop-blur-xl p-8 text-center"
+      >
+        <div className="flex flex-col items-center justify-center gap-6">
+          <div>
+            <p className="text-[#6b7280] text-sm uppercase tracking-widest font-medium mb-4">
+              Performance do Portfólio
+            </p>
+            <ScoreRing score={stats.avg_score} size="lg" />
+          </div>
+          <div className="max-w-2xl">
+            <p className="text-lg text-white mb-2">
+              {stats.avg_score >= 80
+                ? "🚀 Portfólio extraordinário! Suas ofertas têm altíssimo potencial de conversão."
+                : stats.avg_score >= 60
+                ? "⚡ Bom portfolio. Há oportunidades de otimização em algumas ofertas."
+                : "📈 Há espaço para melhorias. Analise as ofertas com score baixo."}
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          {stats.total_offers === 0 && (
-            <button
-              onClick={handleSeed}
-              disabled={seeding}
-              className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
-            >
-              {seeding ? "Inserindo..." : "🌱 Carregar dados de exemplo"}
-            </button>
+      </motion.div>
+
+      {/* Insights Row */}
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <motion.div
+          whileHover={{ y: -4 }}
+          className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 backdrop-blur-xl p-6"
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <TrendingUp className="w-5 h-5 text-emerald-400" />
+            <h3 className="font-semibold text-white">Padrões Identificados</h3>
+          </div>
+          <p className="text-3xl font-bold text-emerald-400 mb-2">
+            {stats.total_patterns}
+          </p>
+          <p className="text-sm text-[#9ca3af]">
+            Padrões recorrentes de sucesso encontrados
+          </p>
+        </motion.div>
+
+        <motion.div
+          whileHover={{ y: -4 }}
+          className="rounded-2xl border border-pink-500/20 bg-gradient-to-br from-pink-500/10 to-pink-500/5 backdrop-blur-xl p-6"
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <Award className="w-5 h-5 text-pink-400" />
+            <h3 className="font-semibold text-white">Top Performer</h3>
+          </div>
+          {topOffers[0] && (
+            <>
+              <p className="text-sm font-semibold text-white mb-1 truncate">
+                {topOffers[0].name}
+              </p>
+              <p className="text-2xl font-bold text-pink-400">
+                {topOffers[0].offer_score}/100
+              </p>
+            </>
           )}
+        </motion.div>
+
+        <motion.div
+          whileHover={{ y: -4 }}
+          className="rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 backdrop-blur-xl p-6"
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <Zap className="w-5 h-5 text-indigo-400" />
+            <h3 className="font-semibold text-white">Análises Claude</h3>
+          </div>
+          <p className="text-3xl font-bold text-indigo-400 mb-2">
+            {stats.analyzed_offers}
+          </p>
+          <p className="text-sm text-[#9ca3af]">
+            Ofertas dissecadas e analisadas
+          </p>
+        </motion.div>
+      </motion.div>
+
+      {/* Top Offers Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+      >
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+              <Target className="w-8 h-8 text-indigo-400" />
+              Top Ofertas
+            </h2>
+            <p className="text-[#6b7280] mt-2">
+              Suas ofertas com melhor score e potencial
+            </p>
+          </div>
           <Link
-            href="/offers/new"
-            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-sm font-medium transition-colors"
+            href="/library"
+            className="px-6 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 rounded-xl font-semibold transition-colors border border-indigo-500/30"
           >
-            + Nova Oferta
+            Ver todas →
           </Link>
         </div>
-      </div>
 
-      {seedMsg && (
-        <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 text-sm">
-          {seedMsg}
-        </div>
-      )}
-
-      {stats.alerts.length > 0 && (
-        <div className="mb-6 space-y-2">
-          {stats.alerts.map((alert, i) => (
-            <div key={i} className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-amber-400 text-sm flex items-center gap-2">
-              <span>⚠</span> {alert}
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {topOffers.map((offer) => (
+            <GlassCard key={offer.id} offer={offer} />
           ))}
         </div>
-      )}
+      </motion.div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Total de Ofertas" value={stats.total_offers} />
-        <StatCard
-          label="Analisadas com Claude"
-          value={stats.analyzed_offers}
-          sub={`de ${stats.total_offers} total`}
-          color="text-purple-400"
-        />
-        <StatCard label="Ofertas Hot 🔥" value={stats.hot_offers} color="text-emerald-400" />
-        <StatCard label="Score Médio" value={stats.avg_score} color={scoreColor} sub="/100" />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-[#12121a] border border-[#1e1e2e] rounded-xl p-6">
-          <h2 className="text-white font-semibold mb-4">Top Ofertas por Score</h2>
-          {stats.top_offers.length === 0 ? (
-            <p className="text-[#6b7280] text-sm">Nenhuma oferta ainda.</p>
-          ) : (
-            <div className="space-y-3">
-              {stats.top_offers.map((o, i) => (
-                <Link key={o.id} href={`/offers/${o.id}`} className="flex items-center gap-3 hover:bg-[#1e1e2e] p-2 rounded-lg transition-colors">
-                  <span className="text-[#4b5563] text-sm font-mono w-5">#{i + 1}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white truncate">{o.name}</p>
-                    <p className="text-xs text-[#6b7280]">{o.niche}</p>
-                  </div>
-                  <span className="text-sm font-bold text-indigo-400">{Math.round(o.offer_score)}</span>
-                </Link>
-              ))}
-            </div>
-          )}
+      {/* CTA Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+        className="rounded-3xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 backdrop-blur-xl p-12 text-center mb-12"
+      >
+        <h3 className="text-2xl font-bold text-white mb-4">
+          Pronto para expandir seu swipe file?
+        </h3>
+        <p className="text-[#9ca3af] mb-8 max-w-xl mx-auto">
+          Adicione novas ofertas ou explore padrões de sucesso já identificados.
+        </p>
+        <div className="flex gap-4 justify-center">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={stats.total_offers === 0 ? handleSeed : undefined}
+            disabled={seeding || stats.total_offers > 0}
+            className="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/30 transition-all disabled:opacity-50"
+          >
+            {stats.total_offers === 0
+              ? seeding
+                ? "Carregando dados..."
+                : "🌱 Carregar Dados de Exemplo"
+              : "✓ Dados Carregados"}
+          </motion.button>
+          <Link href="/offers/new">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-3 border border-indigo-500/30 text-indigo-400 rounded-xl font-semibold hover:bg-indigo-500/10 transition-all"
+            >
+              + Nova Oferta
+            </motion.button>
+          </Link>
         </div>
-
-        <div className="bg-[#12121a] border border-[#1e1e2e] rounded-xl p-6">
-          <h2 className="text-white font-semibold mb-4">Distribuição por Score</h2>
-          <div className="space-y-3">
-            {Object.entries(stats.score_ranges).map(([range, count]) => {
-              const total = stats.total_offers || 1;
-              const pct = Math.round((count / total) * 100);
-              return (
-                <div key={range}>
-                  <div className="flex justify-between text-xs text-[#6b7280] mb-1">
-                    <span>{range} pts</span>
-                    <span>{count} ofertas ({pct}%)</span>
-                  </div>
-                  <div className="h-2 bg-[#1e1e2e] rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-indigo-500 rounded-full"
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-[#12121a] border border-[#1e1e2e] rounded-xl p-6">
-          <h2 className="text-white font-semibold mb-4">Distribuição por Nicho</h2>
-          <div className="space-y-2">
-            {stats.niche_distribution.map((n) => (
-              <div key={n.niche} className="flex items-center justify-between p-2 bg-[#1e1e2e] rounded-lg">
-                <span className="text-sm text-[#9ca3af]">{n.niche}</span>
-                <span className="text-sm font-medium text-white">{n.count}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-[#12121a] border border-[#1e1e2e] rounded-xl p-6">
-          <h2 className="text-white font-semibold mb-4">Adicionadas Recentemente</h2>
-          {stats.recent_offers.length === 0 ? (
-            <p className="text-[#6b7280] text-sm">Nenhuma oferta ainda.</p>
-          ) : (
-            <div className="space-y-2">
-              {stats.recent_offers.map((o) => (
-                <Link key={o.id} href={`/offers/${o.id}`} className="flex items-center justify-between p-2 hover:bg-[#1e1e2e] rounded-lg transition-colors">
-                  <div>
-                    <p className="text-sm text-white">{o.name}</p>
-                    <p className="text-xs text-[#6b7280]">{o.advertiser}</p>
-                  </div>
-                  <span className="text-xs text-[#6b7280]">
-                    {o.created_at ? new Date(o.created_at).toLocaleDateString("pt-BR") : ""}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
