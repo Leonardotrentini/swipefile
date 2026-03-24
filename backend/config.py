@@ -20,3 +20,7 @@ if not ANTHROPIC_API_KEY:
     print(f"WARNING: ANTHROPIC_API_KEY vazio! Arquivo .env: {env_file}")
 else:
     print(f"[OK] ANTHROPIC_API_KEY carregada ({len(ANTHROPIC_API_KEY)} chars)")
+
+# Log configuration
+print(f"[CONFIG] DATABASE_URL: {DATABASE_URL[:50]}..." if len(DATABASE_URL) > 50 else f"[CONFIG] DATABASE_URL: {DATABASE_URL}")
+print(f"[CONFIG] CORS_ORIGINS: {CORS_ORIGINS}")
