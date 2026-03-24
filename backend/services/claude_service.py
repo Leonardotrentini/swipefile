@@ -1,8 +1,28 @@
 import anthropic
 import json
-from config import ANTHROPIC_API_KEY
+import os
 
-client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+# Carregar .env uma unica vez
+from pathlib import Path
+_env_file = Path(__file__).parent.parent / ".env"
+_env_dict = {}
+
+if _env_file.exists():
+    with open(_env_file) as f:
+        for line in f:
+            line = line.strip()
+            if line and "=" in line and not line.startswith("#"):
+                k, v = line.split("=", 1)
+                _env_dict[k.strip()] = v.strip()
+
+_API_KEY = _env_dict.get("ANTHROPIC_API_KEY", "")
+print(f"[claude_service.py] API_KEY loaded: {len(_API_KEY)} chars" if _API_KEY else "[claude_service.py] API_KEY EMPTY!")
+
+def get_client():
+    """Retorna cliente Anthropic com chave."""
+    if not _API_KEY:
+        raise ValueError("ANTHROPIC_API_KEY nao encontrada no .env")
+    return anthropic.Anthropic(api_key=_API_KEY)
 
 
 DISSECTION_PROMPT = """Você é um especialista em marketing direto e copywriting. Analise a oferta abaixo e extraia uma dissecação completa e estruturada.
@@ -54,11 +74,23 @@ async def analyze_offer(offer_data: dict) -> dict:
         ad_copy=offer_data.get("ad_copy", "N/A"),
     )
 
-    message = client.messages.create(
-        model="claude-sonnet-4-5",
-        max_tokens=2048,
-        messages=[{"role": "user", "content": prompt}],
-    )
+    try:
+        client = get_client()
+        print(f"[DEBUG] Client obtained: {type(client)}")
+    except Exception as e:
+        print(f"[ERROR] get_client failed: {e}")
+        raise
+
+    try:
+        message = client.messages.create(
+            model="claude-sonnet-4-5",
+            max_tokens=2048,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        print(f"[DEBUG] Message created successfully")
+    except Exception as e:
+        print(f"[ERROR] messages.create failed: {e}")
+        raise
 
     raw_response = message.content[0].text
 

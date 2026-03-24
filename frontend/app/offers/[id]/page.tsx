@@ -235,6 +235,39 @@ export default function OfferDetailPage() {
             )}
           </div>
 
+          {(offer.thank_you_url || (offer.domains_assigned && offer.domains_assigned.length > 0)) && (
+            <div className="bg-[#12121a] border border-[#1e1e2e] rounded-xl p-6">
+              <h2 className="text-white font-semibold mb-4">🎯 Funil & Domínios</h2>
+              <div className="space-y-4">
+                {offer.thank_you_url && (
+                  <div>
+                    <p className="text-xs text-[#6b7280] uppercase tracking-wider mb-1">Página de Obrigado</p>
+                    <a
+                      href={offer.thank_you_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-indigo-400 hover:text-indigo-300 text-sm break-all underline"
+                    >
+                      {offer.thank_you_url}
+                    </a>
+                  </div>
+                )}
+                {offer.domains_assigned && offer.domains_assigned.length > 0 && (
+                  <div>
+                    <p className="text-xs text-[#6b7280] uppercase tracking-wider mb-2">Domínios Atribuídos</p>
+                    <div className="flex flex-wrap gap-2">
+                      {offer.domains_assigned.map((domain: string) => (
+                        <span key={domain} className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded-lg border border-emerald-500/30">
+                          {domain}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {displayInsight && (
             <DissectionPanel data={displayInsight} />
           )}

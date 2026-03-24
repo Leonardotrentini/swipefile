@@ -32,7 +32,10 @@ class Offer(Base):
     ad_copy = Column(Text, nullable=True)
     destination_url = Column(String, nullable=True)
     checkout_url = Column(String, nullable=True)
+    thank_you_url = Column(String, nullable=True)
     meta_library_url = Column(String, nullable=True)
+
+    domains_assigned = Column(Text, nullable=True)  # JSON array de domínios
 
     offer_score = Column(Float, default=0.0)
 

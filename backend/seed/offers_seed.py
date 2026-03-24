@@ -24,6 +24,8 @@ SEED_OFFERS = [
         "ad_copy": "Médicos não querem que você saiba isso... Essa nutricionista descobriu o CÓDIGO que faz seu corpo queimar gordura 24h por dia. Clique e garanta seu acesso antes que eles tirem do ar.",
         "destination_url": "https://hotmart.com/produto/codigo-magreza",
         "checkout_url": "https://pay.hotmart.com/codigo-magreza",
+        "thank_you_url": "https://hotmart.com/obrigado/codigo-magreza",
+        "domains_assigned": '["codigomagreza.com.br", "hotmart.com"]',
         "meta_library_url": "https://www.facebook.com/ads/library/?id=codigomagreza",
     },
     {
@@ -46,6 +48,8 @@ SEED_OFFERS = [
         "ad_copy": "Eu estava R$78 mil no vermelho há 3 anos. Hoje tenho 6 fontes de renda. A diferença foi uma mudança de mentalidade que ninguém ensina. Acesse agora e descubra o método.",
         "destination_url": "https://hotmart.com/produto/millionaire-mindset",
         "checkout_url": "https://pay.hotmart.com/millionaire-mindset",
+        "thank_you_url": "https://hotmart.com/obrigado/millionaire-mindset",
+        "domains_assigned": '["millionairemindset.com.br", "hotmart.com"]',
         "meta_library_url": "https://www.facebook.com/ads/library/?id=millionairemindset",
     },
     {
@@ -68,6 +72,8 @@ SEED_OFFERS = [
         "ad_copy": "Eu tentei curso, Duolingo e YouTube por 5 anos. Nada funcionou. Até descobrir esse método que ativa a parte do cérebro responsável por absorver idiomas naturalmente. Garanta seu acesso hoje.",
         "destination_url": "https://kiwify.app/ingles-fluente-90",
         "checkout_url": "https://pay.kiwify.app/ingles-fluente-90",
+        "thank_you_url": "https://kiwify.app/obrigado/ingles-fluente-90",
+        "domains_assigned": '["fluentbr.com.br", "kiwify.app"]',
         "meta_library_url": "https://www.facebook.com/ads/library/?id=ingles90dias",
     },
     {
@@ -90,6 +96,8 @@ SEED_OFFERS = [
         "ad_copy": "Você faz tudo certo mas ele ainda parece distante? Psicóloga revela o segredo por trás dos relacionamentos que duram. Acesse o método completo com desconto de hoje.",
         "destination_url": "https://hotmart.com/produto/relacionamento-blindado",
         "checkout_url": "https://pay.hotmart.com/relacionamento-blindado",
+        "thank_you_url": "https://hotmart.com/obrigado/relacionamento-blindado",
+        "domains_assigned": '["relacionamentoblindado.com.br", "hotmart.com"]',
         "meta_library_url": "",
     },
     {
@@ -112,6 +120,8 @@ SEED_OFFERS = [
         "ad_copy": "Com 58 anos, sem experiência em investimentos, aprendi esse método em 30 dias. No segundo mês já cobri minha aposentadoria. Veja como funciona na prática — vagas limitadas para o grupo VIP.",
         "destination_url": "https://hotmart.com/produto/trader-do-zero",
         "checkout_url": "https://pay.hotmart.com/trader-do-zero",
+        "thank_you_url": "https://hotmart.com/obrigado/trader-do-zero",
+        "domains_assigned": '["traderdozero.com.br", "hotmart.com"]',
         "meta_library_url": "https://www.facebook.com/ads/library/?id=traderdozero",
     },
     {
@@ -134,6 +144,8 @@ SEED_OFFERS = [
         "ad_copy": "Dermatologistas receitam remédios caros que travam o crescimento do cabelo. Essa trichologista descobriu a combinação NATURAL que faz seus fios crescerem como nunca. Assista ao vídeo completo.",
         "destination_url": "https://monetizze.com.br/produto/cabelo-dos-sonhos",
         "checkout_url": "https://pay.monetizze.com.br/cabelo-dos-sonhos",
+        "thank_you_url": "https://monetizze.com.br/obrigado/cabelo-dos-sonhos",
+        "domains_assigned": '["cabelodossonhos.com.br", "monetizze.com.br"]',
         "meta_library_url": "https://www.facebook.com/ads/library/?id=cabelodossonhos",
     },
     {
@@ -156,6 +168,8 @@ SEED_OFFERS = [
         "ad_copy": "Analisei as 50 VSLs de maior conversão do Brasil nos últimos 2 anos. Encontrei 7 padrões que todas têm em comum. Hoje vou revelar o blueprint completo para você. Garanta sua vaga.",
         "destination_url": "https://hotmart.com/produto/vsl-copy-blueprint",
         "checkout_url": "https://pay.hotmart.com/vsl-copy-blueprint",
+        "thank_you_url": "https://hotmart.com/obrigado/vsl-copy-blueprint",
+        "domains_assigned": '["vslcopyblueprint.com.br", "hotmart.com"]',
         "meta_library_url": "https://www.facebook.com/ads/library/?id=vslcopyblueprint",
     },
 ]

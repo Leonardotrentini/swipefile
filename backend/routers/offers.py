@@ -31,7 +31,9 @@ class OfferCreate(BaseModel):
     ad_copy: Optional[str] = None
     destination_url: Optional[str] = None
     checkout_url: Optional[str] = None
+    thank_you_url: Optional[str] = None
     meta_library_url: Optional[str] = None
+    domains_assigned: Optional[str] = None
 
 
 class OfferUpdate(OfferCreate):
@@ -64,7 +66,9 @@ def offer_to_dict(offer: Offer) -> dict:
         "ad_copy": offer.ad_copy,
         "destination_url": offer.destination_url,
         "checkout_url": offer.checkout_url,
+        "thank_you_url": offer.thank_you_url,
         "meta_library_url": offer.meta_library_url,
+        "domains_assigned": json.loads(offer.domains_assigned) if offer.domains_assigned else [],
         "offer_score": offer.offer_score,
         "created_at": offer.created_at.isoformat() if offer.created_at else None,
         "updated_at": offer.updated_at.isoformat() if offer.updated_at else None,

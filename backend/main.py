@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 
 app = FastAPI(
-    title="DR Intel — Swipe File",
+    title="LT ARTS — Swipe File",
     description="Mineração e dissecação de ofertas vencedoras com Claude AI",
     version="1.0.0",
 )
@@ -45,3 +45,12 @@ def seed_offers():
 @app.get("/", tags=["health"])
 def root():
     return {"status": "ok", "app": "DR Intel Swipe File", "docs": "/docs"}
+
+
+@app.get("/debug/key", tags=["debug"])
+def debug_key():
+    """Teste se a chave está sendo carregada."""
+    from config import ANTHROPIC_API_KEY
+    if ANTHROPIC_API_KEY:
+        return {"status": "OK", "key_length": len(ANTHROPIC_API_KEY)}
+    return {"status": "ERROR", "message": "ANTHROPIC_API_KEY vazio"}
