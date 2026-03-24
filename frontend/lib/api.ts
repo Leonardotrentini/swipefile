@@ -75,7 +75,9 @@ export interface Offer {
   ad_copy: string | null;
   destination_url: string | null;
   checkout_url: string | null;
+  thank_you_url: string | null;
   meta_library_url: string | null;
+  domains_assigned: string[];
   offer_score: number;
   created_at: string | null;
   updated_at: string | null;
