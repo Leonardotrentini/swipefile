@@ -7,6 +7,9 @@ from models.insight import Insight
 from services.claude_service import analyze_offer
 from services.pattern_engine import update_patterns
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/offers", tags=["analyze"])
 
@@ -32,7 +35,9 @@ async def analyze(offer_id: int, db: Session = Depends(get_db)):
     try:
         result = await analyze_offer(offer_data)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao chamar Claude: {str(e)}")
+        error_msg = str(e)
+        logger.error(f"Erro ao analisar oferta {offer_id}: {error_msg}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Erro ao chamar Claude: {error_msg}")
 
     if offer.insight:
         ins = offer.insight
