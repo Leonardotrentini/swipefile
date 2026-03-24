@@ -36,3 +36,5 @@ yarn-debug.log*
 *.db
 *.sqlite
 dr_intel.db
+.vercel
+.env*.local
