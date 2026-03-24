@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 
@@ -92,20 +93,24 @@ export default function HeroSection() {
           variants={itemVariants}
           className="flex gap-4"
         >
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/30 transition-all"
-          >
-            Explorar ofertas
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-3 border border-indigo-500/30 text-indigo-400 rounded-xl font-semibold hover:bg-indigo-500/10 transition-all"
-          >
-            Documentação
-          </motion.button>
+          <Link href="/library">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/30 transition-all"
+            >
+              Explorar ofertas
+            </motion.button>
+          </Link>
+          <Link href="/docs">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-3 border border-indigo-500/30 text-indigo-400 rounded-xl font-semibold hover:bg-indigo-500/10 transition-all"
+            >
+              Documentação
+            </motion.button>
+          </Link>
         </motion.div>
       </div>
     </motion.div>
