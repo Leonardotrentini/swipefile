@@ -1,0 +1,191 @@
+from sqlalchemy.orm import Session
+from models.offer import Offer
+from models.score import ScoreBreakdown
+from services.score_engine import calculate_score
+
+SEED_OFFERS = [
+    {
+        "name": "Código da Magreza",
+        "advertiser": "NutriPro Brasil",
+        "product": "Curso digital de emagrecimento",
+        "niche": "Saúde & Emagrecimento",
+        "funnel_type": "Front-end + Order Bump + Upsell",
+        "status": "Hot",
+        "ad_count": 87,
+        "ads_running_days": 142,
+        "front_end_price": 47.0,
+        "order_bump_price": 27.0,
+        "upsell_price": 97.0,
+        "headline": "Descubra o código que faz mulheres acima de 40 perderem 8kg em 28 dias sem academia nem dieta restritiva",
+        "avatar": "Mulheres 35-55 anos, com metabolismo lento, que já tentaram várias dietas sem sucesso",
+        "pain_point": "Não conseguem emagrecer mesmo fazendo dieta, sentem que o corpo traiu com a menopausa",
+        "mechanism": "Protocolo de ativação hormonal em 3 fases que reprograma o metabolismo feminino a partir dos 40",
+        "promise": "Perder até 8kg em 28 dias ativando os hormônios certos, sem academia",
+        "ad_copy": "Médicos não querem que você saiba isso... Essa nutricionista descobriu o CÓDIGO que faz seu corpo queimar gordura 24h por dia. Clique e garanta seu acesso antes que eles tirem do ar.",
+        "destination_url": "https://hotmart.com/produto/codigo-magreza",
+        "checkout_url": "https://pay.hotmart.com/codigo-magreza",
+        "meta_library_url": "https://www.facebook.com/ads/library/?id=codigomagreza",
+    },
+    {
+        "name": "Método Millionaire Mindset",
+        "advertiser": "FinanceUp Academy",
+        "product": "Treinamento online de mentalidade financeira",
+        "niche": "Finanças & Investimentos",
+        "funnel_type": "Front-end + Upsell High-ticket",
+        "status": "Hot",
+        "ad_count": 134,
+        "ads_running_days": 210,
+        "front_end_price": 97.0,
+        "order_bump_price": 0.0,
+        "upsell_price": 497.0,
+        "headline": "Como um ex-endividado de R$78 mil descobriu o único sistema que faz o dinheiro trabalhar por você enquanto você dorme",
+        "avatar": "Homens 28-45 anos, classe média, insatisfeitos com salário, querem liberdade financeira",
+        "pain_point": "Trabalham muito mas o dinheiro nunca sobra, sentem que são escravos do sistema",
+        "mechanism": "Sistema de 4 pilares da mentalidade milionária baseado em neuroeconomia comportamental",
+        "promise": "Reprogramar sua relação com dinheiro e criar as primeiras 3 fontes de renda passiva em 90 dias",
+        "ad_copy": "Eu estava R$78 mil no vermelho há 3 anos. Hoje tenho 6 fontes de renda. A diferença foi uma mudança de mentalidade que ninguém ensina. Acesse agora e descubra o método.",
+        "destination_url": "https://hotmart.com/produto/millionaire-mindset",
+        "checkout_url": "https://pay.hotmart.com/millionaire-mindset",
+        "meta_library_url": "https://www.facebook.com/ads/library/?id=millionairemindset",
+    },
+    {
+        "name": "Inglês Fluente em 90 Dias",
+        "advertiser": "FluentBr",
+        "product": "Método de aprendizado de inglês online",
+        "niche": "Educação & Idiomas",
+        "funnel_type": "Funil completo com bump + 2 upsells",
+        "status": "Hot",
+        "ad_count": 203,
+        "ads_running_days": 385,
+        "front_end_price": 67.0,
+        "order_bump_price": 37.0,
+        "upsell_price": 197.0,
+        "headline": "Como falar inglês fluente em 90 dias gastando apenas 15 minutos por dia — mesmo que você já tenha desistido 3 vezes",
+        "avatar": "Brasileiros 25-45 anos que precisam de inglês para trabalho ou promoção mas acham difícil aprender",
+        "pain_point": "Tentaram vários cursos e aplicativos mas nunca evoluíram o suficiente para falar com confiança",
+        "mechanism": "Método da imersão contextual passiva: seu cérebro aprende inglês enquanto você faz atividades do dia a dia",
+        "promise": "Falar inglês com fluência e confiança em 90 dias dedicando 15 minutos por dia",
+        "ad_copy": "Eu tentei curso, Duolingo e YouTube por 5 anos. Nada funcionou. Até descobrir esse método que ativa a parte do cérebro responsável por absorver idiomas naturalmente. Garanta seu acesso hoje.",
+        "destination_url": "https://kiwify.app/ingles-fluente-90",
+        "checkout_url": "https://pay.kiwify.app/ingles-fluente-90",
+        "meta_library_url": "https://www.facebook.com/ads/library/?id=ingles90dias",
+    },
+    {
+        "name": "Relacionamento Blindado",
+        "advertiser": "LoveCoach Pro",
+        "product": "Curso de relacionamentos para mulheres",
+        "niche": "Relacionamentos & Autoajuda",
+        "funnel_type": "Front-end + Order Bump",
+        "status": "Observar",
+        "ad_count": 41,
+        "ads_running_days": 67,
+        "front_end_price": 37.0,
+        "order_bump_price": 17.0,
+        "upsell_price": 0.0,
+        "headline": "O segredo que homens nunca contam: como fazer ele pensar em você o tempo todo e nunca querer te perder",
+        "avatar": "Mulheres 25-45 anos em relacionamentos instáveis ou que querem reconquistar ex-parceiro",
+        "pain_point": "Sentem que dão tudo no relacionamento mas não recebem o mesmo, medo de abandono",
+        "mechanism": "Protocolo de conexão emocional profunda baseado em psicologia do apego",
+        "promise": "Fazer seu parceiro se tornar mais atencioso, presente e apaixonado em até 21 dias",
+        "ad_copy": "Você faz tudo certo mas ele ainda parece distante? Psicóloga revela o segredo por trás dos relacionamentos que duram. Acesse o método completo com desconto de hoje.",
+        "destination_url": "https://hotmart.com/produto/relacionamento-blindado",
+        "checkout_url": "https://pay.hotmart.com/relacionamento-blindado",
+        "meta_library_url": "",
+    },
+    {
+        "name": "Trader do Zero",
+        "advertiser": "TradeMaster BR",
+        "product": "Curso de day trade para iniciantes",
+        "niche": "Finanças & Investimentos",
+        "funnel_type": "Front-end + Order Bump + 2 Upsells + High-ticket backend",
+        "status": "Hot",
+        "ad_count": 312,
+        "ads_running_days": 520,
+        "front_end_price": 197.0,
+        "order_bump_price": 97.0,
+        "upsell_price": 997.0,
+        "headline": "Aposentado de 58 anos opera day trade 2h por dia e fatura R$4.800 mensais — método completo revelado",
+        "avatar": "Homens e mulheres 35-60 anos que querem renda extra ou aposentadoria antecipada",
+        "pain_point": "Não têm renda suficiente para se aposentar, medo de depender de outros na velhice",
+        "mechanism": "Estratégia de scalping com gestão de risco proprietária: nunca perde mais do que ganha em uma semana",
+        "promise": "Criar uma renda extra de R$3.000 a R$8.000 mensais operando 2 horas por dia com capital inicial de R$2.000",
+        "ad_copy": "Com 58 anos, sem experiência em investimentos, aprendi esse método em 30 dias. No segundo mês já cobri minha aposentadoria. Veja como funciona na prática — vagas limitadas para o grupo VIP.",
+        "destination_url": "https://hotmart.com/produto/trader-do-zero",
+        "checkout_url": "https://pay.hotmart.com/trader-do-zero",
+        "meta_library_url": "https://www.facebook.com/ads/library/?id=traderdozero",
+    },
+    {
+        "name": "Cabelo dos Sonhos",
+        "advertiser": "BeautyFormula",
+        "product": "Tratamento capilar digital + produto físico",
+        "niche": "Beleza & Estética",
+        "funnel_type": "Front-end + Order Bump + Upsell produto físico",
+        "status": "Novo",
+        "ad_count": 28,
+        "ads_running_days": 34,
+        "front_end_price": 27.0,
+        "order_bump_price": 37.0,
+        "upsell_price": 127.0,
+        "headline": "Trichologista revela a fórmula proibida que faz o cabelo crescer 3cm por mês e para a queda em 7 dias",
+        "avatar": "Mulheres 20-50 anos com queda de cabelo, cabelos finos ou que não crescem",
+        "pain_point": "Cabelo não cresce, fica quebrando, e perdem fios excessivamente gerando insegurança",
+        "mechanism": "Protocolo de nutrição capilar interna + externa com 7 ativos naturais que reativam os folículos dormentes",
+        "promise": "Parar a queda de cabelo em 7 dias e estimular crescimento acelerado de 3cm por mês",
+        "ad_copy": "Dermatologistas receitam remédios caros que travam o crescimento do cabelo. Essa trichologista descobriu a combinação NATURAL que faz seus fios crescerem como nunca. Assista ao vídeo completo.",
+        "destination_url": "https://monetizze.com.br/produto/cabelo-dos-sonhos",
+        "checkout_url": "https://pay.monetizze.com.br/cabelo-dos-sonhos",
+        "meta_library_url": "https://www.facebook.com/ads/library/?id=cabelodossonhos",
+    },
+    {
+        "name": "VSL Copy Blueprint",
+        "advertiser": "CopyMasters Pro",
+        "product": "Curso de copywriting para VSL",
+        "niche": "Marketing & Negócios Digitais",
+        "funnel_type": "Front-end + Order Bump + Upsell + Mentoria high-ticket",
+        "status": "Observar",
+        "ad_count": 56,
+        "ads_running_days": 89,
+        "front_end_price": 297.0,
+        "order_bump_price": 97.0,
+        "upsell_price": 997.0,
+        "headline": "Como escrever VSLs que convertem a 8% ou mais: o blueprint dos 7 maiores faturadores do marketing digital brasileiro",
+        "avatar": "Copywriters e infoprodutores intermediários que querem escalar seus lançamentos e produtos",
+        "pain_point": "Escrevem VSLs mas as conversões são baixas, não sabem o que está bloqueando as vendas",
+        "mechanism": "Framework ROPE (Research, Open loop, Proof, Emotion) aplicado em VSLs de alta conversão",
+        "promise": "Duplicar a taxa de conversão de qualquer VSL em até 30 dias aplicando o blueprint de 7 etapas",
+        "ad_copy": "Analisei as 50 VSLs de maior conversão do Brasil nos últimos 2 anos. Encontrei 7 padrões que todas têm em comum. Hoje vou revelar o blueprint completo para você. Garanta sua vaga.",
+        "destination_url": "https://hotmart.com/produto/vsl-copy-blueprint",
+        "checkout_url": "https://pay.hotmart.com/vsl-copy-blueprint",
+        "meta_library_url": "https://www.facebook.com/ads/library/?id=vslcopyblueprint",
+    },
+]
+
+
+def run_seed(db: Session) -> int:
+    existing_count = db.query(Offer).count()
+    if existing_count > 0:
+        return 0
+
+    inserted = 0
+    for offer_data in SEED_OFFERS:
+        offer = Offer(**offer_data)
+        db.add(offer)
+        db.flush()
+
+        score_data = calculate_score(offer_data)
+        offer.offer_score = score_data["total_score"]
+
+        sb = ScoreBreakdown(
+            offer_id=offer.id,
+            financial_score=score_data["financial_score"],
+            longevity_score=score_data["longevity_score"],
+            promise_score=score_data["promise_score"],
+            market_score=score_data["market_score"],
+            risk_score=score_data["risk_score"],
+            breakdown_json=score_data["breakdown_json"],
+        )
+        db.add(sb)
+        inserted += 1
+
+    db.commit()
+    return inserted
