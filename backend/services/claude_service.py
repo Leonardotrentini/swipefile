@@ -2,20 +2,27 @@ import anthropic
 import json
 import os
 
-# Carregar .env uma unica vez
+# Carregar API KEY - Primeiro tenta variável de sistema (Railway), depois .env (desenvolvimento)
 from pathlib import Path
-_env_file = Path(__file__).parent.parent / ".env"
-_env_dict = {}
 
-if _env_file.exists():
-    with open(_env_file) as f:
-        for line in f:
-            line = line.strip()
-            if line and "=" in line and not line.startswith("#"):
-                k, v = line.split("=", 1)
-                _env_dict[k.strip()] = v.strip()
+# Primeiro tenta as variáveis de ambiente do sistema (Railway injeta aqui)
+_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 
-_API_KEY = _env_dict.get("ANTHROPIC_API_KEY", "")
+# Se não encontrou no sistema, tenta carregar do arquivo .env local (desenvolvimento)
+if not _API_KEY:
+    _env_file = Path(__file__).parent.parent / ".env"
+    _env_dict = {}
+
+    if _env_file.exists():
+        with open(_env_file) as f:
+            for line in f:
+                line = line.strip()
+                if line and "=" in line and not line.startswith("#"):
+                    k, v = line.split("=", 1)
+                    _env_dict[k.strip()] = v.strip()
+
+    _API_KEY = _env_dict.get("ANTHROPIC_API_KEY", "")
+
 print(f"[claude_service.py] API_KEY loaded: {len(_API_KEY)} chars" if _API_KEY else "[claude_service.py] API_KEY EMPTY!")
 
 def get_client():
