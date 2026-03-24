@@ -53,7 +53,7 @@ export default function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10">
-        <motion.div variants={itemVariants} className="flex items-center gap-2 mb-4">
+        <motion.div variants={itemVariants} initial="hidden" animate="visible" className="flex items-center gap-2 mb-4">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
@@ -67,6 +67,8 @@ export default function HeroSection() {
 
         <motion.h1
           variants={itemVariants}
+          initial="hidden"
+          animate="visible"
           className="text-5xl md:text-6xl font-bold text-white mb-4 leading-tight"
         >
           Disseque ofertas <br />
@@ -83,6 +85,8 @@ export default function HeroSection() {
 
         <motion.p
           variants={itemVariants}
+          initial="hidden"
+          animate="visible"
           className="text-lg text-[#9ca3af] max-w-2xl mb-8"
         >
           Mineração inteligente, análise com Claude AI e identificação de padrões
@@ -91,6 +95,8 @@ export default function HeroSection() {
 
         <motion.div
           variants={itemVariants}
+          initial="hidden"
+          animate="visible"
           className="flex gap-4"
         >
           <Link href="/library">
