@@ -29,7 +29,9 @@ app.include_router(patterns.router)
 
 @app.on_event("startup")
 def startup():
+    print("[APP] Starting up - initializing database...")
     init_db()
+    print("[APP] Database initialized successfully!")
 
 
 @app.post("/seed", tags=["seed"])
