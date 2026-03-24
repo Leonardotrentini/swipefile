@@ -3,7 +3,7 @@ import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 
 export const metadata: Metadata = {
-  title: "DR Intel — Swipe File",
+  title: "LT ARTS — Swipe File",
   description: "Mineração e dissecação de ofertas vencedoras com Claude AI",
 };
 

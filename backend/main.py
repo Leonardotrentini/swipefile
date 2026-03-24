@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 
 app = FastAPI(
-    title="DR Intel — Swipe File",
+    title="LT ARTS — Swipe File",
     description="Mineração e dissecação de ofertas vencedoras com Claude AI",
     version="1.0.0",
 )

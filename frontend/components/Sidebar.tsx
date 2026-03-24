@@ -45,7 +45,7 @@ export default function Sidebar() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              DR Intel
+              LT ARTS
             </motion.p>
             <motion.p
               className="text-[#6b7280] text-xs group-hover:text-[#9ca3af] transition-colors"

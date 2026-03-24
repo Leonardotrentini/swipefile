@@ -60,7 +60,7 @@ export default function HeroSection() {
             <Sparkles className="w-6 h-6 text-indigo-400" />
           </motion.div>
           <span className="text-sm font-medium text-indigo-400">
-            Bem-vindo ao DR Intel
+            Bem-vindo ao LT ARTS
           </span>
         </motion.div>
 
